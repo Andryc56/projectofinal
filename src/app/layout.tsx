@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, Roboto_Mono, Montserrat, Poppins } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { AuthProvider } from "@/context/AuthContext";
+import { AuthProvider } from "@/context/AuthContext.jsx";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import React from 'react';
 
 const inter = Inter({
   variable: "--font-inter",
@@ -40,6 +41,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
+      <head>
+        <style jsx global>{`
+          :root {
+            --font-inter: ${inter.style.fontFamily};
+            --font-roboto-mono: ${robotoMono.style.fontFamily};
+            --font-montserrat: ${montserrat.style.fontFamily};
+            --font-poppins: ${poppins.style.fontFamily};
+          }
+        `}</style>
+      </head>
       <body
         className={`${inter.variable} ${robotoMono.variable} ${montserrat.variable} ${poppins.variable} antialiased`}
       >
