@@ -1,19 +1,15 @@
 [build]
-  # Instalar las dependencias con la versión correcta de npm
   command = "npm install -g npm@10.2.4 && npm install && npm run build"
   publish = ".next"
   functions = "netlify/functions"
 
-# Configuración de entorno de construcción
 [build.environment]
-  # Versión de Node.js y npm
+  # Versiones de Node.js y npm
   NODE_VERSION = "18.18.0"
   NPM_VERSION = "10.2.4"
   
-  # Forzar el uso de la versión correcta de npm
+  # Configuración de npm
   NPM_FLAGS = "--prefer-offline --no-audit --progress=false"
-  
-  # Configuración de entorno para Node.js
   NODE_VERBOSE = "false"
   NPM_CONFIG_PREFER_OFFLINE = "true"
   NPM_CONFIG_AUDIT = "false"
@@ -22,7 +18,11 @@
   NPM_CONFIG_UPDATE_NOTIFIER = "false"
   NPM_CONFIG_LOCKFILE_VERSION = "3"
   
-  # Variables de entorno de Firebase (se configuran en la UI de Netlify)
+  # Configuración de Next.js
+  NEXT_TELEMETRY_DISABLED = "1"
+  NODE_OPTIONS = "--max_old_space_size=4096"
+  
+  # Variables de entorno de Firebase (configuradas en la UI de Netlify)
   NEXT_PUBLIC_FIREBASE_API_KEY = "${FIREBASE_API_KEY}"
   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = "${FIREBASE_AUTH_DOMAIN}"
   NEXT_PUBLIC_FIREBASE_PROJECT_ID = "${FIREBASE_PROJECT_ID}"
@@ -30,38 +30,19 @@
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = "${FIREBASE_MESSAGING_SENDER_ID}"
   NEXT_PUBLIC_FIREBASE_APP_ID = "${FIREBASE_APP_ID}"
   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID = "${FIREBASE_MEASUREMENT_ID}"
-  
-  # Configuración de caché y rendimiento
-  NPM_FLAGS = "--prefer-offline --no-audit --progress=false"
-  YARN_FLAGS = "--prefer-offline --no-progress"
-  
-  # Deshabilitar telemetría de Next.js
-  NEXT_TELEMETRY_DISABLED = "1"
-  
-  # Aumentar memoria para Node.js
-  NODE_OPTIONS = "--max_old_space_size=4096"
 
-# Configuración de redirecciones para SPA
+# Plugin de Next.js
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Redirecciones
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
 
-# Configuración de encabezados de seguridad
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.googleapis.com;"
-
-# Next.js plugin
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-# Basic security headers
+# Encabezados de seguridad
 [[headers]]
   for = "/*"
   [headers.values]
@@ -72,7 +53,7 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://identitytoolkit.googleapis.com; frame-src 'self' https://www.google.com https://www.youtube.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/ https://www.google.com/maps/; frame-ancestors 'none'; form-action 'self' https://identitytoolkit.googleapis.com; base-uri 'self'; object-src 'none';"
 
-# Cache headers for static assets
+# Encabezados de caché para activos estáticos
 [[headers]]
   for = "/*.js"
   [headers.values]
