@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuración para la exportación estática (requerida por Netlify)
-  output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
+  // Deshabilitar exportación estática para compatibilidad con funcionalidades del lado del servidor
+  output: 'standalone',
   
   // Configuración de imágenes
   images: {
@@ -37,18 +37,16 @@ const nextConfig = {
     }),
   },
 
-  // Configuración de redirecciones (manejada por netlify.toml en producción)
-  ...(process.env.NODE_ENV !== 'production' && {
-    async redirects() {
-      return [
-        {
-          source: '/',
-          destination: '/inicio',
-          permanent: true,
-        },
-      ]
-    },
-  }),
+  // Configuración de redirecciones
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/inicio',
+        permanent: true,
+      },
+    ]
+  },
   
   // Configuración de reescrituras (solo en desarrollo)
   ...(process.env.NODE_ENV !== 'production' && {
