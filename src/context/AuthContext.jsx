@@ -314,19 +314,39 @@ export function AuthProvider({ children }) {
 
   // Función para actualizar el perfil del usuario
   const updateProfile = async (updatedData) => {
+    // Validación de entrada
+    if (!user) {
+      return { success: false, error: 'No hay usuario autenticado' };
+    }
+
+    if (!updatedData || typeof updatedData !== 'object' || Object.keys(updatedData).length === 0) {
+      return { success: false, error: 'No se proporcionaron datos para actualizar' };
+    }
+    
+    const batch = writeBatch(db);
+    const userRef = doc(db, 'users', user.uid);
+    const updates = {};
+    let newPhotoURL = null;
+    let fileToUpload = null;
+    
     try {
-      if (!user) {
-        throw new Error('No hay usuario autenticado');
-      }
-      
-      const updates = {};
-      let newPhotoURL = null;
-      let fileToUpload = null;
-      
-      // Verificar si hay un archivo para subir (blob de imagen)
+      // Validar y procesar la imagen de perfil si se proporciona
       if (updatedData.photoFile) {
+        if (!(updatedData.photoFile instanceof File)) {
+          throw new Error('El archivo de imagen no es válido');
+        }
+        
+        // Validar tamaño de la imagen (máximo 5MB)
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        if (updatedData.photoFile.size > MAX_FILE_SIZE) {
+          return { 
+            success: false, 
+            error: 'La imagen es demasiado grande. El tamaño máximo permitido es de 5MB.' 
+          };
+        }
+        
         fileToUpload = updatedData.photoFile;
-        delete updatedData.photoFile; // Eliminar el archivo de los datos a actualizar
+        delete updatedData.photoFile;
       }
       
       // Subir nueva imagen si existe
@@ -337,63 +357,102 @@ export function AuthProvider({ children }) {
         }
         newPhotoURL = uploadResult.url;
         
-        // Si ya existe una foto de perfil, intentar eliminarla
-        if (user.photoURL && user.photoURL.startsWith('https://firebasestorage.googleapis.com')) {
-          await deleteImage(user.photoURL).catch(error => {
-            console.error('No se pudo eliminar la imagen anterior:', error);
-          });
+        // Si hay una imagen anterior, programar su eliminación (se ejecutará después de la actualización exitosa)
+        const oldPhotoURL = user.photoURL;
+        if (oldPhotoURL && oldPhotoURL.startsWith('https://firebasestorage.googleapis.com')) {
+          // Usar un pequeño retraso para asegurar que la actualización se complete
+          setTimeout(() => {
+            deleteImage(oldPhotoURL).catch(error => {
+              console.warn('No se pudo eliminar la imagen anterior:', error);
+            });
+          }, 5000); // 5 segundos de retraso
         }
         
         // Actualizar photoURL en Authentication
         await firebaseUpdateProfile(auth.currentUser, {
           photoURL: newPhotoURL
         });
+        
+        // Agregar a las actualizaciones
         updates.photoURL = newPhotoURL;
+        batch.update(userRef, { photoURL: newPhotoURL });
       }
       
-      // Actualizar displayName en Authentication si se proporciona
-      if (updatedData.name) {
-        await firebaseUpdateProfile(auth.currentUser, {
-          displayName: updatedData.name
-        });
-        updates.name = updatedData.name;
+      // Actualizar displayName si se proporciona
+      if (updatedData.name && typeof updatedData.name === 'string') {
+        const trimmedName = updatedData.name.trim();
+        if (trimmedName.length > 0) {
+          await firebaseUpdateProfile(auth.currentUser, {
+            displayName: trimmedName
+          });
+          updates.name = trimmedName;
+          batch.update(userRef, { displayName: trimmedName });
+        }
       }
       
-      // Actualizar otros campos en Firestore
-      if (Object.keys(updates).length > 0 || Object.keys(updatedData).some(key => !['name', 'photoURL', 'photoFile'].includes(key))) {
-        // Filtrar campos que ya se actualizaron en Authentication
-        const firestoreUpdates = { ...updatedData };
-        delete firestoreUpdates.photoURL; // Ya manejado por Authentication
-        delete firestoreUpdates.photoFile; // No es un campo de Firestore
-        
-        // Renombrar 'name' a 'displayName' para Firestore si existe
-        if (firestoreUpdates.name) {
-          firestoreUpdates.displayName = firestoreUpdates.name;
-          delete firestoreUpdates.name;
+      // Procesar otros campos para Firestore
+      const firestoreUpdates = {};
+      const excludedFields = ['name', 'photoURL', 'photoFile'];
+      
+      Object.entries(updatedData).forEach(([key, value]) => {
+        if (!excludedFields.includes(key) && value !== undefined && value !== null) {
+          firestoreUpdates[key] = value;
         }
-        
-        // Si hay una nueva URL de foto, incluirla en Firestore
-        if (newPhotoURL) {
-          firestoreUpdates.photoURL = newPhotoURL;
-        }
-        
-        // Actualizar en Firestore
-        await updateDoc(doc(db, 'users', user.uid), firestoreUpdates);
+      });
+      
+      // Si hay actualizaciones para Firestore, agregarlas al batch
+      if (Object.keys(firestoreUpdates).length > 0) {
+        batch.update(userRef, firestoreUpdates);
       }
+      
+      // Ejecutar todas las actualizaciones en una sola transacción
+      if (batch._mutations.length > 0) {
+        await batch.commit();
+      }
+      
+      // Actualizar el estado local del usuario
+      const updatedUser = {
+        ...user,
+        ...updates,
+        ...firestoreUpdates,
+        photoURL: newPhotoURL || user.photoURL,
+        displayName: updates.name || user.displayName || user.name
+      };
+      
+      // Eliminar duplicados y limpiar
+      delete updatedUser.name;
+      setUser(updatedUser);
       
       return { 
         success: true, 
-        user: {
-          ...user,
-          ...updates,
-          photoURL: newPhotoURL || user.photoURL
-        } 
+        user: updatedUser,
+        message: 'Perfil actualizado correctamente'
       };
+      
     } catch (error) {
-      console.error("Error al actualizar perfil:", error);
+      console.error('Error al actualizar perfil:', error);
+      
+      // Revertir cambios si hay un error
+      if (newPhotoURL) {
+        deleteImage(newPhotoURL).catch(console.error);
+      }
+      
+      // Mapear errores comunes a mensajes más amigables
+      let errorMessage = 'Error al actualizar el perfil';
+      const errorCode = error.code || '';
+      
+      if (errorCode.includes('auth/network-request-failed')) {
+        errorMessage = 'Error de conexión. Por favor, verifica tu conexión a internet.';
+      } else if (errorCode.includes('permission-denied')) {
+        errorMessage = 'No tienes permiso para realizar esta acción.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       return { 
         success: false, 
-        error: error.message || 'Error al actualizar el perfil' 
+        error: errorMessage,
+        code: errorCode
       };
     }
   };

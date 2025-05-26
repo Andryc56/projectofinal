@@ -97,8 +97,20 @@ const nextConfig = {
   
   // Configuración de webpack
   webpack: (config, { isServer, dev }) => {
-    // Configuraciones personalizadas de webpack
-    
+    // Configuración específica para el cliente
+    if (!isServer) {
+      // Configuración para el navegador
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+        child_process: false,
+        dgram: false,
+      };
+    }
+
     // Solo en producción
     if (!dev && !isServer) {
       // Optimizaciones para el cliente
@@ -128,27 +140,26 @@ const nextConfig = {
   
   // Configuración experimental
   experimental: {
-    // Deshabilitar características experimentales que podrían causar problemas
-    turbo: false,
-    optimizeCss: false,
-    // Mejora el rendimiento de la carga de módulos
+    // Habilitar el nuevo motor de renderizado
+    serverActions: true,
+    // Mejorar el rendimiento de la compilación
+    optimizeCss: true,
+    // Optimizar importaciones de paquetes grandes
     optimizePackageImports: [
       'framer-motion',
       'react-icons',
-      'date-fns',
+      'date-fns'
     ],
+    // Mejorar el rendimiento del servidor
+    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
+    // Mejorar el rendimiento de la compilación
+    workerThreads: true,
+    // Deshabilitar características problemáticas
+    turbo: false
   },
   
-  // Configuración de caché
-  cache: {
-    type: 'filesystem',
-    buildDependencies: {
-      config: [__filename],
-    },
-    cacheDirectory: '.next/cache',
-    name: 'nextjs',
-    compression: 'gzip',
-  },
+  // La caché ahora se maneja automáticamente por Next.js
+  // No es necesario configurarla manualmente
   
   // Configuración de logging
   logging: {
@@ -158,10 +169,5 @@ const nextConfig = {
   },
 };
 
-// Configuración para análisis de paquetes
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
-
 // Exportar la configuración
-module.exports = withBundleAnalyzer(nextConfig);
+module.exports = nextConfig;
