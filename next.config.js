@@ -140,10 +140,6 @@ const nextConfig = {
   
   // Configuración experimental
   experimental: {
-    // Habilitar el nuevo motor de renderizado
-    serverActions: true,
-    // Mejorar el rendimiento de la compilación
-    optimizeCss: true,
     // Optimizar importaciones de paquetes grandes
     optimizePackageImports: [
       'framer-motion',
@@ -154,8 +150,8 @@ const nextConfig = {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
     // Mejorar el rendimiento de la compilación
     workerThreads: true,
-    // Deshabilitar características problemáticas
-    turbo: false
+    // Configuración de Turbo (objeto vacío para desactivar la advertencia)
+    turbo: {}
   },
   
   // La caché ahora se maneja automáticamente por Next.js
