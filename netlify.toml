@@ -1,5 +1,5 @@
 [build]
-  command = "npm install && npm run build"
+  command = "npm ci && npm run build"
   publish = ".next"
   functions = "netlify/functions"
   edge_handlers = "netlify/edge-handlers"
@@ -11,7 +11,8 @@
   YARN_VERSION = "3.6.4"
   
   # Configuración de npm
-  NPM_FLAGS = "--prefer-offline --no-audit --progress=false"
+  NPM_FLAGS = "--legacy-peer-deps --prefer-offline --no-audit --progress=false"
+  NPM_TOKEN = "${NPM_TOKEN}"
   NODE_VERBOSE = "false"
   NPM_CONFIG_PREFER_OFFLINE = "true"
   NPM_CONFIG_AUDIT = "false"
