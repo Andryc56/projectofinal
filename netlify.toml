@@ -4,8 +4,9 @@
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
-  NODE_VERSION = "18.0.0"
+  NODE_VERSION = "18.18.0"
   NPM_FLAGS = "--legacy-peer-deps"
+  NPM_VERSION = "10.2.4"  # Versión de npm compatible con Node.js 18
 
 [context.production]
   command = "npm run build"
