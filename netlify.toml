@@ -1,12 +1,14 @@
 [build]
-  command = "npm install -g npm@10.2.4 && npm install && npm run build"
+  command = "npm install && npm run build"
   publish = ".next"
   functions = "netlify/functions"
+  edge_handlers = "netlify/edge-handlers"
 
 [build.environment]
   # Versiones de Node.js y npm
   NODE_VERSION = "18.18.0"
   NPM_VERSION = "10.2.4"
+  YARN_VERSION = "3.6.4"
   
   # Configuración de npm
   NPM_FLAGS = "--prefer-offline --no-audit --progress=false"
@@ -21,6 +23,8 @@
   # Configuración de Next.js
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_OPTIONS = "--max_old_space_size=4096"
+  NEXT_SHARP_PATH = "/tmp/node_modules/sharp"
+  NODE_USE_SHARP = "true"
   
   # Variables de entorno de Firebase (configuradas en la UI de Netlify)
   NEXT_PUBLIC_FIREBASE_API_KEY = "${FIREBASE_API_KEY}"
