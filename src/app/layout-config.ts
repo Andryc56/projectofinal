@@ -1,28 +1,22 @@
 import type { Metadata } from "next";
-import { Inter, Roboto_Mono, Montserrat, Poppins } from "next/font/google";
 
-export const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
+// Font configuration using CSS variables
+// These will be loaded via CSS @import in globals.css
+export const fontVariables = {
+  inter: "var(--font-inter)",
+  robotoMono: "var(--font-roboto-mono)",
+  montserrat: "var(--font-montserrat)",
+  poppins: "var(--font-poppins)"
+} as const;
 
-export const robotoMono = Roboto_Mono({
-  variable: "--font-roboto-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-export const montserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
-});
-
-export const poppins = Poppins({
-  variable: "--font-poppins",
-  weight: ["300", "400", "500", "600", "700"],
-  subsets: ["latin"],
-});
+// Font weights and styles for reference
+export const fontWeights = {
+  light: 300,
+  regular: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700
+} as const;
 
 export const metadata: Metadata = {
   title: "Portal Informativo Departamental",

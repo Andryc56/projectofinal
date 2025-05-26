@@ -13,6 +13,9 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
   
+  // Deshabilitar la optimización de fuentes para evitar conflictos con Babel
+  optimizeFonts: false,
+  
   // Configuración de webpack
   webpack: (config, { isServer }) => {
     // Configuración de polyfills necesarios para Firebase
