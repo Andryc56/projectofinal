@@ -120,33 +120,34 @@ const nextConfig = {
   // Generar mapas de fuente para producción
   productionBrowserSourceMaps: false,
   
-  // Configuración de internacionalización (solo en desarrollo para exportación estática)
-  ...(process.env.NODE_ENV !== 'production' && {
-    i18n: {
-      locales: ['es'],
-      defaultLocale: 'es',
-    },
-  }),
+  // Configuración de internacionalización
+  i18n: {
+    locales: ['es'],
+    defaultLocale: 'es',
+  },
   
-  // Configuración de caché
+  // Configuración experimental
   experimental: {
-    // Habilita el caché de compilación persistente
-    turbo: {
-      rules: {
-        '*.{js,jsx,ts,tsx}': ['@swc/jest'],
-      },
-    },
-    // Mejora el rendimiento de la compilación
-    optimizeCss: true,
+    // Deshabilitar características experimentales que podrían causar problemas
+    turbo: false,
+    optimizeCss: false,
     // Mejora el rendimiento de la carga de módulos
     optimizePackageImports: [
       'framer-motion',
       'react-icons',
       'date-fns',
-      'zod',
-      'react-hook-form',
-      '@hookform/resolvers',
     ],
+  },
+  
+  // Configuración de caché
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename],
+    },
+    cacheDirectory: '.next/cache',
+    name: 'nextjs',
+    compression: 'gzip',
   },
   
   // Configuración de logging
