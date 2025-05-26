@@ -3,57 +3,20 @@
   publish = ".next"
 
 [build.environment]
-  NEXT_TELEMETRY_DISABLED = "1"
   NODE_VERSION = "18.18.0"
+  NPM_VERSION = "10.2.4"
   NPM_FLAGS = "--legacy-peer-deps"
-  NPM_VERSION = "10.2.4"  # Versión de npm compatible con Node.js 18
-  NEXT_PRIVATE_TARGET = "server"
+  NEXT_TELEMETRY_DISABLED = "1"
   NODE_OPTIONS = "--max_old_space_size=4096"
 
-[context.production]
-  command = "npm run build"
-  publish = ".next"
-  environment = { 
-    NODE_ENV = "production",
-    NEXT_TELEMETRY_DISABLED = "1"
-  }
+[context.production.environment]
+  NODE_ENV = "production"
 
-[context.deploy-preview]
-  command = "npm run build"
-  publish = ".next"
-  environment = { 
-    NODE_ENV = "production",
-    NEXT_TELEMETRY_DISABLED = "1"
-  }
+[context.deploy-preview.environment]
+  NODE_ENV = "production"
 
-[context.branch-deploy]
-  command = "npm run build"
-  publish = ".next"
-  environment = { 
-    NODE_ENV = "production",
-    NEXT_TELEMETRY_DISABLED = "1"
-  }
-
-[build.processing]
-  skip_processing = false
-
-[build.processing.html]
-  pretty_urls = true
-
-[build.processing.css]
-  bundle = true
-  minify = true
-
-[build.processing.js]
-  bundle = true
-  minify = true
-
-[build.processing.images]
-  compress = true
-
-[build.processing.caching]
-  # Configuración de caché para mejorar el rendimiento
-  cache_control = "public, max-age=31536000, must-revalidate"
+[context.branch-deploy.environment]
+  NODE_ENV = "production"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
@@ -65,32 +28,17 @@
   force = false
 
 [headers]
-  # Configuración de seguridad para todas las rutas
-  [[headers.values]]
-    for = "/*"
-    [headers.values.values]
-      X-Frame-Options = "DENY"
-      X-Content-Type-Options = "nosniff"
-      X-XSS-Protection = "1; mode=block"
-      Referrer-Policy = "strict-origin-when-cross-origin"
-      Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-      Content-Security-Policy = """
-        default-src 'self';
-        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com;
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-        img-src 'self' data: https:;
-        font-src 'self' https://fonts.gstatic.com;
-        connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com;
-        frame-src 'self' https://www.google.com https://www.youtube.com;
-        frame-ancestors 'none';
-        form-action 'self';
-        base-uri 'self';
-        object-src 'none';
-        """
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com; frame-src 'self' https://www.google.com https://www.youtube.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none';"
 
 [dev]
-  framework = "next"
-  targetPort = 3000
+  command = "npm run dev"
   port = 3000
   publish = ".next"
-  command = "npm run dev"
+  targetPort = 3000
