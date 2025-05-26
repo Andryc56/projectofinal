@@ -1,0 +1,12 @@
+specVersion: "v1"
+serviceId: "my-project-f7f6f-service"
+location: "us-west2"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "my-project-f7f6f-database"
+      cloudSql:
+        instanceId: "my-project-f7f6f-instance"
+      # schemaValidation: "COMPATIBLE"
+connectorDirs: ["./connector"]

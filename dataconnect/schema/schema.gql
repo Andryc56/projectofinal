@@ -1,0 +1,42 @@
+type User @table {
+  uid: UUID!
+  email: String!
+  displayName: String
+  photoURL: String
+  department: Department
+  themePreference: String
+}
+
+type Department @table {
+  name: String!
+  description: String!
+  contactEmail: String
+  contactPhone: String
+  location: DepartmentLocation
+  websiteURL: String
+  imageUrl: String
+}
+
+type NewsArticle @table {
+  title: String!
+  content: String!
+  department: Department!
+  publicationDate: Timestamp
+  author: String
+  imageUrl: String
+}
+
+type ContactFormSubmission @table {
+  name: String!
+  email: String!
+  message: String!
+  createdAt: Timestamp!
+  subject: String
+}
+
+type DepartmentLocation @table {
+  department: Department! @unique
+  latitude: Float
+  longitude: Float
+  address: String
+}
