@@ -51,17 +51,19 @@ const nextConfig = {
   experimental: {
     // Optimizar importaciones de paquetes grandes
     optimizePackageImports: [
-      'framer-motion',
       'react-icons',
       'date-fns'
     ],
     // Mejorar el rendimiento del servidor
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
-    // Mejorar el rendimiento de la compilación
-    workerThreads: true,
-    // Configuración de Turbo (objeto vacío para desactivar la advertencia)
+    // Configuración de características experimentales
+    workerThreads: false,
+    // Configuración mínima de Turbo
     turbo: {}
   },
+  
+  // Configuración de transpilación para paquetes de nodo
+  transpilePackages: ['framer-motion'],
   
   // Configuración de encabezados de seguridad
   async headers() {
