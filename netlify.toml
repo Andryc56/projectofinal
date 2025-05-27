@@ -1,18 +1,17 @@
 [build]
-  command = "npm install --legacy-peer-deps --no-offline && npm run build"
+  command = "npm install --legacy-peer-deps && npm run build"
   publish = ".next"
   functions = "netlify/functions"
-  edge_handlers = "netlify/edge-handlers"
 
 [build.environment]
-  # Versiones de Node.js y npm
   NODE_VERSION = "18.18.0"
   NPM_VERSION = "10.2.4"
-  YARN_VERSION = "3.6.4"
   
-  # Configuración de npm
-  NPM_FLAGS = "--legacy-peer-deps --no-offline --no-audit --progress=true"
-  NPM_TOKEN = "${NPM_TOKEN}"
+  # Disable Next.js telemetry
+  NEXT_TELEMETRY_DISABLED = "1"
+  
+  # Configure npm
+  NPM_FLAGS = "--legacy-peer-deps --no-audit --progress=true"
   NODE_VERBOSE = "true"
   NPM_CONFIG_PREFER_OFFLINE = "false"
   NPM_CONFIG_AUDIT = "false"
@@ -21,9 +20,11 @@
   NPM_CONFIG_UPDATE_NOTIFIER = "false"
   NPM_CONFIG_LOCKFILE_VERSION = "2"
   
-  # Configuración de Next.js
-  NEXT_TELEMETRY_DISABLED = "1"
-  NODE_OPTIONS = "--max-old-space-size=4096"
+  # Configure Next.js build cache
+  NEXT_CACHE_DIR = ".next/cache"
+  
+  # Increase Node.js memory limit
+  NODE_OPTIONS = "--max_old_space_size=4096"
   NEXT_SHARP_PATH = "/opt/buildhome/.npm/lib/node_modules/sharp"
   NODE_USE_SHARP = "1"
   
