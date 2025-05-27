@@ -1,5 +1,5 @@
 [build]
-  command = "npm ci && npm run build"
+  command = "npm install --legacy-peer-deps --no-offline && npm run build"
   publish = ".next"
   functions = "netlify/functions"
   edge_handlers = "netlify/edge-handlers"
@@ -11,21 +11,21 @@
   YARN_VERSION = "3.6.4"
   
   # Configuración de npm
-  NPM_FLAGS = "--legacy-peer-deps --prefer-offline --no-audit --progress=false"
+  NPM_FLAGS = "--legacy-peer-deps --no-offline --no-audit --progress=true"
   NPM_TOKEN = "${NPM_TOKEN}"
-  NODE_VERBOSE = "false"
-  NPM_CONFIG_PREFER_OFFLINE = "true"
+  NODE_VERBOSE = "true"
+  NPM_CONFIG_PREFER_OFFLINE = "false"
   NPM_CONFIG_AUDIT = "false"
-  NPM_CONFIG_PROGRESS = "false"
+  NPM_CONFIG_PROGRESS = "true"
   NPM_CONFIG_FUND = "false"
   NPM_CONFIG_UPDATE_NOTIFIER = "false"
-  NPM_CONFIG_LOCKFILE_VERSION = "3"
+  NPM_CONFIG_LOCKFILE_VERSION = "2"
   
   # Configuración de Next.js
   NEXT_TELEMETRY_DISABLED = "1"
-  NODE_OPTIONS = "--max_old_space_size=4096"
-  NEXT_SHARP_PATH = "/tmp/node_modules/sharp"
-  NODE_USE_SHARP = "true"
+  NODE_OPTIONS = "--max-old-space-size=4096"
+  NEXT_SHARP_PATH = "/opt/buildhome/.npm/lib/node_modules/sharp"
+  NODE_USE_SHARP = "1"
   
   # Variables de entorno de Firebase (configuradas en la UI de Netlify)
   NEXT_PUBLIC_FIREBASE_API_KEY = "${FIREBASE_API_KEY}"

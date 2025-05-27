@@ -7,6 +7,30 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   
+  // Ensure webpack resolves react and react-dom from the project's node_modules
+  webpack: (config, { isServer }) => {
+    // Force webpack to resolve react and react-dom from the project's node_modules
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      react: require.resolve('react'),
+      'react-dom': require.resolve('react-dom'),
+      'react/jsx-runtime': require.resolve('react/jsx-runtime')
+    };
+    
+    // Configuración de polyfills necesarios para Firebase
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+        child_process: false,
+      };
+    }
+    return config;
+  },
+  
   // Configuración de imágenes
   images: {
     domains: ['firebasestorage.googleapis.com', 'lh3.googleusercontent.com'],
